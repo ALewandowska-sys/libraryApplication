@@ -1,0 +1,28 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet  id="Create book" author="alewandowska">
+        <createTable tableName="book">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" unique="true"/>  </column>
+            <column name="title" type="varchar(100)">
+                <constraints nullable="false"/>                 </column>
+            <column name="year" type="integer">
+                <constraints nullable="false"/>                 </column>
+            <column name="available" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>                 </column>
+            <column name="whoBorrow" type="bigint">            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="Rename column in book" author="alewandowska">
+        <renameColumn tableName="book" oldColumnName="whoBorrow" newColumnName="who_borrow"/>
+    </changeSet>
+
+    <changeSet id="Change type of whoBorrow" author="alewandowska">
+        <modifyDataType tableName="book" columnName="who_borrow" newDataType="INTEGER"/>
+    </changeSet>
+
+</databaseChangeLog>
