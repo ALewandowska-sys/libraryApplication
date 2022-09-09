@@ -19,6 +19,9 @@ When user borrow book, application save this information in history.
 I think that I could make it by listener, but for now it's created inside the function 
 (I create a history with information about book, but rest of information like date or author is created automatically)
 
+### PostgreSQL, liquibase, hibernate
+Inside my code, you can find things to connect to database, like changelogs, information in application.properties or hibernate annotations.
+
 ## How does it work?
   > I will show some endpoints, using Vaadin and Postman
 ### Vaadin menu
