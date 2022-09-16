@@ -28,7 +28,8 @@ public class GeneratorPDF{
         font.setSize(35);
         return new Paragraph("Nothing to show", font);
     }
-    private PdfPTable table(List<?> objects, int limit) throws IllegalAccessException {
+    private PdfPTable table(List<?> objects, int limit)
+            throws IllegalAccessException {
 
         Field[] fields = objects.get(0).getClass().getDeclaredFields();
 
@@ -37,11 +38,14 @@ public class GeneratorPDF{
         cell.setBackgroundColor(CMYKColor.GRAY);
         cell.setPadding(5);
 
-        font.setSize(10);
-        for (Field field : fields) {
-            cell.setPhrase(new Phrase(field.getName(), font));
-            table.addCell(cell);
-        }
+        addMainCells(cell, table, fields);
+        addCells(cell, table, fields, objects, limit);
+
+        return table;
+    }
+
+    private void addCells(PdfPCell cell, PdfPTable table, Field[] fields, List<?> objects, int limit)
+            throws IllegalAccessException {
 
         cell.setBackgroundColor(CMYKColor.LIGHT_GRAY);
         int counter = 0;
@@ -56,23 +60,24 @@ public class GeneratorPDF{
                 table.addCell(cell);
             }
         }
-        return table;
+    }
+
+    private void addMainCells(PdfPCell cell, PdfPTable table, Field[]  fields) {
+        font.setSize(10);
+        for (Field field : fields) {
+            cell.setPhrase(new Phrase(field.getName(), font));
+            table.addCell(cell);
+        }
     }
 
     private void generator(Document document, String info, int limit, List<?> objects)
             throws IllegalAccessException {
-        document.open();
 
+        document.open();
         document.add(createTitle(info));
         document.add( Chunk.NEWLINE );
 
-        if(objects.isEmpty()){
-            document.add(createInfoAboutEmptyList());
-        }
-        else{
-            document.add(table(objects, limit));
-            document.add( Chunk.NEWLINE );
-        }
+        checkListOfObjects(objects, document, limit);
 
         font.setSize(10);
         Paragraph footer = new Paragraph("Thanks for using our e-library!", font);
@@ -81,8 +86,20 @@ public class GeneratorPDF{
         document.close();
     }
 
+    private void checkListOfObjects(List<?> objects, Document document, int limit)
+            throws IllegalAccessException {
+
+        if(objects.isEmpty()){
+            document.add(createInfoAboutEmptyList());
+        }else {
+            document.add(table(objects, limit));
+            document.add( Chunk.NEWLINE );
+        }
+    }
+
     public void generatePDF(HttpServletResponse response, String info, List<?> objects)
             throws DocumentException, IOException, IllegalAccessException {
+
         Document document = new Document(PageSize.A4);
         int limit = 0;
 
@@ -93,6 +110,7 @@ public class GeneratorPDF{
 
     public ByteArrayOutputStream generateByte(String info, List<?> objects, int limit)
             throws DocumentException, IOException, IllegalAccessException {
+
         Document document = new Document(PageSize.A4);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

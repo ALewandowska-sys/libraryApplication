@@ -71,10 +71,20 @@ public class PDFService {
     private byte[][] createPDFsAsync(String[] filesName, List<List<?>> listWithLists, int howMany)
             throws ExecutionException, InterruptedException {
 
-        GeneratorPDF generator = new GeneratorPDF();
         byte[][] bytesPDFs = new byte[listWithLists.size()][];
         List<CompletableFuture<byte[]>> completableFutures = new ArrayList<>();
 
+        startAsyncGenerator(completableFutures, listWithLists, filesName, howMany, bytesPDFs);
+
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(completableFutures
+                .toArray(new CompletableFuture[0]));
+        allFutures.get();
+
+        return bytesPDFs;
+    }
+
+    private void startAsyncGenerator(List<CompletableFuture<byte[]>> completableFutures, List<List<?>> listWithLists, String[] filesName, int howMany, byte[][] bytesPDFs) {
+        GeneratorPDF generator = new GeneratorPDF();
         for(int i = 0; i < listWithLists.size(); i++){
             int finalI = i;
             CompletableFuture<byte[]> future = CompletableFuture.supplyAsync(() -> {
@@ -88,11 +98,5 @@ public class PDFService {
             }).thenApply(bytes -> bytesPDFs[finalI] = bytes);
             completableFutures.add(future);
         }
-
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(completableFutures
-                .toArray(new CompletableFuture[0]));
-        allFutures.get();
-
-        return bytesPDFs;
     }
 }

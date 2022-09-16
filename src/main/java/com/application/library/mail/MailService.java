@@ -20,16 +20,21 @@ public class MailService {
 
     public void sendMail(String to, String subject, String text, byte[] attachmentByteZip) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper mimeMessageHelper;
 
-        mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setFrom(username);
-        mimeMessageHelper.setTo(to);
-        mimeMessageHelper.setText(text);
-        mimeMessageHelper.setSubject(subject);
+        MimeMessageHelper mimeMessageHelper = addToMail(username, to, text, subject, mimeMessage);
 
         mimeMessageHelper.addAttachment("latestChanges.zip",
                 new ByteArrayDataSource(attachmentByteZip, "application/x-7z-compressed"));
         javaMailSender.send(mimeMessage);
+    }
+
+    private MimeMessageHelper addToMail(String username, String to, String text, String subject, MimeMessage mimeMessage)
+            throws MessagingException {
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+        mimeMessageHelper.setFrom(username);
+        mimeMessageHelper.setTo(to);
+        mimeMessageHelper.setText(text);
+        mimeMessageHelper.setSubject(subject);
+        return mimeMessageHelper;
     }
 }

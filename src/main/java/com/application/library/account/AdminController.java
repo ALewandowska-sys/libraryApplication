@@ -57,16 +57,19 @@ public class AdminController {
     @GetMapping("/sendZip/{howMany}")
     public void sendZip(HttpServletResponse response, @PathVariable("howMany") int howMany)
             throws ExecutionException, InterruptedException, IOException {
+        List<List<?>> listWithLists = createLists();
+        String[] filesName = {"history", "readers", "borrow"};
         String info = "latest_changes";
 
+        pdfService.createZipWithPDFs(response, filesName, listWithLists, howMany, info);
+    }
+
+    private List<List<?>> createLists() {
         List<HistoryModel> history = getHistory();
         List<ReaderModel> readers = readerService.getReaders();
         List<BookModel> borrowBook = getBorrowBook();
 
-        List<List<?>> listWithLists = List.of(history, readers, borrowBook);
-        String[] filesName = {"history", "readers", "borrow"};
-
-        pdfService.createZipWithPDFs(response, filesName, listWithLists, howMany, info);
+        return List.of(history, readers, borrowBook);
     }
 
     @ApiOperation(value = "Show all borrowed books for every readers")

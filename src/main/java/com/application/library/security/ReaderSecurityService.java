@@ -14,16 +14,12 @@ import org.springframework.stereotype.Service;
 public class ReaderSecurityService implements UserDetailsService {
     @Autowired
     private ReaderRepo repo;
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if(username.equals("admin")){
-            return User
-                    .withUsername("admin")
-                    .password(encoder.encode("admin"))
-                    .roles("Admin", "Reader")
-                    .build();
+            return addStaticAdmin();
         }
         final ReaderModel customer = repo.findByName(username);
         if(customer == null){
@@ -34,5 +30,13 @@ public class ReaderSecurityService implements UserDetailsService {
                 .password(customer.getPassword())
                 .roles("Reader")
                 .build();
+    }
+
+    private UserDetails addStaticAdmin() {
+        return User
+            .withUsername("admin")
+            .password(encoder.encode("admin"))
+            .roles("Admin", "Reader")
+            .build();
     }
 }
